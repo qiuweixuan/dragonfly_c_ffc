@@ -1,9 +1,7 @@
-#include<stdio.h>
-#include <stdlib.h>
 #include "../include/ffc_group.h"
 #include "../include/cstring.h"
 
-static const unsigned char dh_group5_prime[192] = {
+static const uint8_t dh_group5_prime[192] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xC9, 0x0F, 0xDA, 0xA2, 0x21, 0x68, 0xC2, 0x34,
     0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 0x1C, 0xD1,
@@ -29,7 +27,7 @@ static const unsigned char dh_group5_prime[192] = {
     0xF1, 0x74, 0x6C, 0x08, 0xCA, 0x23, 0x73, 0x27,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-static const unsigned char dh_group5_order[192] = {
+static const uint8_t dh_group5_order[192] = {
     0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xE4, 0x87, 0xED, 0x51, 0x10, 0xB4, 0x61, 0x1A,
     0x62, 0x63, 0x31, 0x45, 0xC0, 0x6E, 0x0E, 0x68,
@@ -55,7 +53,7 @@ static const unsigned char dh_group5_order[192] = {
     0x78, 0xBA, 0x36, 0x04, 0x65, 0x11, 0xB9, 0x93,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-static const unsigned char dh_group15_prime[384] = {
+static const uint8_t dh_group15_prime[384] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xC9, 0x0F, 0xDA, 0xA2, 0x21, 0x68, 0xC2, 0x34,
     0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 0x1C, 0xD1,
@@ -104,7 +102,7 @@ static const unsigned char dh_group15_prime[384] = {
     0x43, 0xDB, 0x5B, 0xFC, 0xE0, 0xFD, 0x10, 0x8E,
     0x4B, 0x82, 0xD1, 0x20, 0xA9, 0x3A, 0xD2, 0xCA,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-static const unsigned char dh_group15_order[384] = {
+static const uint8_t dh_group15_order[384] = {
     0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xE4, 0x87, 0xED, 0x51, 0x10, 0xB4, 0x61, 0x1A,
     0x62, 0x63, 0x31, 0x45, 0xC0, 0x6E, 0x0E, 0x68,
@@ -154,14 +152,14 @@ static const unsigned char dh_group15_order[384] = {
     0x25, 0xC1, 0x68, 0x90, 0x54, 0x9D, 0x69, 0x65,
     0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-static const FFC_GROUP GROUP5 = {
+static const FFC_Group GROUP5 = {
     .prime = dh_group5_prime,
     .order = dh_group5_order,
     .group_type = DH_GROUP5,
     .group_len = sizeof(dh_group5_prime)
 };
 
-static const FFC_GROUP GROUP15 = {
+static const FFC_Group GROUP15 = {
     .prime = dh_group15_prime,
     .order = dh_group15_order,
     .group_type = DH_GROUP15,
@@ -169,9 +167,9 @@ static const FFC_GROUP GROUP15 = {
 };
 
 
-const FFC_GROUP *ffc_group_factory(const FFC_GROUP_TYPE group_type)
+const FFC_Group *ffc_group_factory(const FFC_Group_Type group_type)
 {
-    const FFC_GROUP* res;
+    const FFC_Group* res;
     switch (group_type)
     {
     case DH_GROUP5:
@@ -186,7 +184,7 @@ const FFC_GROUP *ffc_group_factory(const FFC_GROUP_TYPE group_type)
     }
 }
 
-int gmp_ffc_group_factory(GMP_FFC_GROUP* gmp_group, const FFC_GROUP_TYPE group_type)
+int gmp_ffc_group_factory(GMP_FFC_Group* gmp_group, const FFC_Group_Type group_type)
 {
     if(gmp_group == NULL){
         return -1;
@@ -204,9 +202,12 @@ int gmp_ffc_group_factory(GMP_FFC_GROUP* gmp_group, const FFC_GROUP_TYPE group_t
         return -1;
     }
     
-    unsigned int str_len =  gmp_group->base->group_len;
+    uint32_t str_len =  gmp_group->base->group_len;
     // 分配足够的数组空间
-    unsigned char* hex_str = (unsigned char*)malloc(str_len * 2 * sizeof(unsigned char) + 1);
+    uint8_t* hex_str = (uint8_t*)malloc(str_len * 2 * sizeof(uint8_t) + 1);
+    // 字符串结尾加'\0'
+    hex_str[str_len * 2] = '\0';
+
     // 初始化gmp_prime和gmp_order
     str2hex_str(hex_str,gmp_group->base->prime,str_len);
     mpz_init_set_str(gmp_group->gmp_prime,hex_str,16);

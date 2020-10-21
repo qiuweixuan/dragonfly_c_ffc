@@ -14,7 +14,7 @@ TEST_TARGET= $(patsubst %.c, %, $(TEST_SRC))
 
  
 .PHONY: all
-all:  $(TARGET) 
+all:  $(TARGET) $(TEST_TARGET)
 
 $(TARGET):$(SRC_OBJ) $(ROOT_OBJ) 
 	$(CXX) $^ -std=c11 -o $@ $(EXTERN_LIB)
