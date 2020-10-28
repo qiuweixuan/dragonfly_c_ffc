@@ -1,5 +1,5 @@
 #include "../include/std_common.h"
-#include "../include/dragonfy_op.h"
+#include "../include/dragonfly_op.h"
 #include "../include/cstring.h"
 #include "../include/ssl.h"
 
@@ -14,7 +14,7 @@ int main()
         .random_len = sizeof(client_random)
     };
     uint8_t counter = 1;
-    uint8_t digest[HMAC_SHA256_DIGEST_SIZE];
+    
 
     uint8_t password_str[] = "abcdefgh";
     Password pwd = {
@@ -22,7 +22,14 @@ int main()
         .len = strlen(password_str)
     };
 
-    compute_hashed_password(digest,&randoms,&pwd,counter);
+    uint8_t digest[HMAC_SHA256_DIGEST_SIZE];
+    CString cstring_digest = {
+        .str = digest,
+        .len = sizeof(digest)
+    };
+
+
+    compute_hashed_password(&cstring_digest,&randoms,&pwd,counter);
 
     printf("digest:\n");
     print_hex_str(digest,sizeof(digest));

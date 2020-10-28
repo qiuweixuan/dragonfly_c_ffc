@@ -156,17 +156,19 @@ static const FFC_Group GROUP5 = {
     .prime = dh_group5_prime,
     .order = dh_group5_order,
     .group_type = DH_GROUP5,
-    .group_len = sizeof(dh_group5_prime)
+    .group_len = sizeof(dh_group5_prime),
+    .safe_prime = 1
 };
 
 static const FFC_Group GROUP15 = {
     .prime = dh_group15_prime,
     .order = dh_group15_order,
     .group_type = DH_GROUP15,
-    .group_len = sizeof(dh_group15_prime)
+    .group_len = sizeof(dh_group15_prime),
+    .safe_prime = 1
 };
 
-
+// 构建有限域群的工厂方法
 const FFC_Group *ffc_group_factory(const FFC_Group_Type group_type)
 {
     const FFC_Group* res;
@@ -183,8 +185,8 @@ const FFC_Group *ffc_group_factory(const FFC_Group_Type group_type)
         break;
     }
 }
-
-int gmp_ffc_group_factory(GMP_FFC_Group* gmp_group, const FFC_Group_Type group_type)
+// 初始化GMP有限域群的工厂方法
+int gmp_ffc_group_factory_init(GMP_FFC_Group* gmp_group, const FFC_Group_Type group_type)
 {
     if(gmp_group == NULL){
         return -1;
@@ -216,4 +218,33 @@ int gmp_ffc_group_factory(GMP_FFC_Group* gmp_group, const FFC_Group_Type group_t
     // 释放数组空间
     free(hex_str);
     return 0;
+}
+
+
+
+// 清理GMP有限域群的方法
+void gmp_ffc_group_clear(GMP_FFC_Group* gmp_group)
+{
+    if(gmp_group == NULL){
+        return;
+    }
+    mpz_clear(gmp_group->gmp_prime);
+    mpz_clear(gmp_group->gmp_order);
+}
+
+// 有限域标量运算
+void ffc_scalar_op(mpz_t rop, const mpz_t op_exp, const mpz_t op_base,const GMP_FFC_Group *ffc_group)
+{
+    mpz_powm(rop, op_base, op_exp, ffc_group->gmp_prime);
+}
+// 有限域元素（向量）运算
+void ffc_element_op(mpz_t rop, const mpz_t op1, const mpz_t op2,const GMP_FFC_Group *ffc_group)
+{
+    mpz_mul(rop, op1, op2);
+    mpz_mod(rop, rop, ffc_group->gmp_prime);
+}
+// 有限域求逆运算
+void ffc_inverse_op(mpz_t rop, const mpz_t op,const GMP_FFC_Group *ffc_group)
+{
+    mpz_invert(rop, op, ffc_group->gmp_prime);
 }

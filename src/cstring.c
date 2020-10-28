@@ -136,3 +136,36 @@ uint16_t transmute_u16_to_u8str(const uint16_t n, const U32Kind mode)
 
     return rop;
 }
+
+uint8_t* memcpy_move_dstptr(uint8_t* dst,const uint8_t*src,const uint32_t len)
+{
+    memcpy(dst,src,len);
+    dst += len;
+    return dst;
+
+}
+
+void cstring_set_mpz(mpz_t gmp_op,const CString* str_op)
+{
+    // 分配足够的数组空间
+    // uint8_t hex_str = malloc(str_len * 2 * sizeof(uint8_t) + 1);
+    uint8_t hex_str[str_op->len * 2 + 1];
+  
+    // 字符串结尾加'\0'
+    hex_str[str_op->len * 2] = '\0';
+
+    // 初始化gmp_prime和gmp_order
+    str2hex_str(hex_str,str_op->str,str_op->len);
+    mpz_set_str(gmp_op,hex_str,16);
+}
+
+void mpz_print_hex(mpz_t op)
+{
+    int base = 16;
+    unsigned int len = mpz_sizeinbase(op, base) + 2 + 1;
+    char *rop = malloc(sizeof(char) * len);
+    mpz_get_str(rop, base, op);
+    rop[len-1]= '\0';
+    printf("%s\n",rop);
+    free(rop);
+}
